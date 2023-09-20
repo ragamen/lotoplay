@@ -113,6 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Lottery> availableLotteries = [];
+  int nroSerial = 0;
+  int numeroTicket = 0;
   @override
   void initState() {
     super.initState();
@@ -121,6 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    obtenerSerial(
+        AgenciaActual.agenciaActual[0].codigoagencia, nroSerial, numeroTicket);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ventas de Loterías'),
@@ -376,8 +380,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   selectedLotteries = [];
                   selectedDraws = [];
                   selectedNumbers = [];
-                  //  selectedLottery = selectedLottery;
-                  //  selectedDraw = selectedDraw;
                   selectedLottery = null;
                   availableLotteries = getAvailableLotteries();
                   purchaseAmount = 0.0;

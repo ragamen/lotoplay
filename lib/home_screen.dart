@@ -55,6 +55,29 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> grupo5 = [
     'Guacharo Activo',
   ];
+  List<Draw> availableDraws = [];
+
+  List<Draw> getAvailableDraws() {
+    if (availableDraws.isEmpty) {
+      // Realizar alguna acción o devolver un valor predeterminado si la lista está vacía
+      return [];
+    }
+
+    final now = DateTime.now();
+    DateTime fiveMinutesFromNow = now.subtract(const Duration(minutes: 5));
+    final filteredDraws = availableDraws.where((draw) {
+      final drawTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        int.parse(draw.name.split(':')[0]),
+        int.parse(draw.name.split(':')[1].split(' ')[0]),
+      );
+      return drawTime.isAfter(fiveMinutesFromNow);
+    }).toList();
+
+    return filteredDraws;
+  }
 
   List<Lottery> getAvailableLotteries() {
     if (selectedLottery == null) {
@@ -155,6 +178,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             selectedLottery = newValue;
                             newValue?.isSelected = !newValue.isSelected;
                             // Actualizar availableLotteries después de seleccionar la primera lotería
+                            availableDraws = selectedLottery!.draws;
+                            availableDraws = getAvailableDraws();
+
                             availableLotteries = getAvailableLotteries();
 //                            availableLotteries = availableLotteries
 //                                .where((lottery) => lottery != newValue)
@@ -179,44 +205,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         }).toList(),
                       ),
-                      /*
-                      child: DropdownButton<Lottery>(
-                        borderRadius:
-                            const BorderRadius.all(Radius.elliptical(25, 25)),
-                        value: selectedLottery,
-                        onChanged: (Lottery? newValue) {
-                          setState(() {
-                            selectedDraw = null;
-                            selectedNumber = null;
-                            if (selectedLotteries.contains(newValue)) {
-                              selectedLotteries.remove(newValue);
-                            } else {
-                              selectedLotteries.add(newValue!);
-                            }
-                            selectedLottery = newValue;
-                            newValue?.isSelected = !newValue.isSelected;
-                          });
-                        },
-                        items: Loterias.lotteries.map((Lottery lottery) {
-                          return DropdownMenuItem<Lottery>(
-                            value: lottery,
-                            child: SizedBox(
-                              width: 160,
-                              child: ListTile(
-                                title: Text(lottery.name),
-                                trailing: lottery.isSelected
-                                    ? const Icon(Icons.check)
-                                    : null,
-                                tileColor: lottery.isSelected
-                                    ? Colors.grey[200]
-                                    : null,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-
-                      */
                     ),
                   ),
                 ),
@@ -241,37 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                         items: selectedLottery != null
-                            ? selectedLottery?.draws.map((Draw draw) {
-                                // Verificar si la hora del sorteo está dentro del rango
-                                // bool isActive = // Lógica para verificar si la hora del sorteo está dentro del rango
-                                var xhora = draw.name.substring(0, 2).trim();
-                                var xminu = draw.name.substring(3, 5).trim();
-//                                var xhora = draw.name.substring(0, 2).trim();
-//var xminu = draw.name.substring(3, 5).trim();
-                                String formattedTime =
-                                    DateFormat.Hms().format(DateTime.now());
-                                var xhora1 =
-                                    formattedTime.substring(0, 1).trim();
-                                var xminu1 =
-                                    formattedTime.substring(3, 5).trim();
-                                int tiempo1 = 0;
-                                if (int.parse(xhora) > 1 &&
-                                    int.parse(xhora) < 7) {
-                                  tiempo1 = (int.parse(xhora) + 12) * 60 +
-                                      int.parse(xminu);
-                                } else {
-                                  tiempo1 =
-                                      int.parse(xhora) * 60 + int.parse(xminu);
-                                }
-                                var tiempo2 =
-                                    int.parse(xhora1) * 60 + int.parse(xminu1);
-                                if ((tiempo1 - tiempo2) < 5) {
-                                  draw.isActive = true;
-                                }
-                                print(
-                                    'hora1 $xhora $draw.name.toString()  $tiempo1');
-                                print('hora2  $formattedTime  $tiempo2');
-
+                            ? availableDraws.map((Draw draw) {
                                 return DropdownMenuItem<Draw>(
                                   value: draw,
                                   child: SizedBox(
@@ -281,12 +239,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       trailing: draw.isSelected
                                           ? const Icon(Icons.check)
                                           : null,
-                                      tileColor: draw.isActive
-                                          ? Color.fromARGB(255, 218, 10, 10)
+                                      tileColor: draw.isSelected
+                                          ? const Color.fromARGB(
+                                              255, 208, 206, 206)
                                           : null,
-//                                      tileColor: draw.isSelected
-//                                          ? Colors.grey[200]
-//                                          : null,
                                     ),
                                   ),
                                 );
@@ -565,46 +521,3 @@ void imprimirLista(purchases) async {
   // Desconectar de la impresora
   await printer.closePrinter();
 }
-
-/*
-class PurchaseAmountFormField extends StatefulWidget {
-  final void Function(double) onChanged;
-
-  const PurchaseAmountFormField({Key? key, required this.onChanged})
-      : super(key: key);
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _PurchaseAmountFormFieldState createState() =>
-      _PurchaseAmountFormFieldState();
-}
-
-class _PurchaseAmountFormFieldState extends State<PurchaseAmountFormField> {
-  TextEditingController controller = TextEditingController();
-  @override
-  void initState() {
-    super.initState();
-    controller.clear();
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 20,
-      child: TextFormField(
-        controller: controller,
-        onChanged: (value) {
-          widget.onChanged(double.parse(value));
-        },
-        keyboardType: TextInputType.number,
-      ),
-    );
-  }
-}
-*/

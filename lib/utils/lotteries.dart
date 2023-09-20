@@ -8,14 +8,14 @@ class Loterias {
       Draw(name: '09:00 Am', numbers: generateNumbers()),
       Draw(name: '10:00 Am', numbers: generateNumbers()),
       Draw(name: '11:00 Am', numbers: generateNumbers()),
-      Draw(name: '12.00 M ', numbers: generateNumbers()),
-      Draw(name: '11:00 Pm', numbers: generateNumbers()),
-      Draw(name: '12:00 Pm', numbers: generateNumbers()),
+      Draw(name: '12:00 M ', numbers: generateNumbers()),
       Draw(name: '13:00 Pm', numbers: generateNumbers()),
-      Draw(name: '14.00 Pm', numbers: generateNumbers()),
+      Draw(name: '14:00 Pm', numbers: generateNumbers()),
       Draw(name: '15:00 Pm', numbers: generateNumbers()),
-      Draw(name: '16.00 Pm', numbers: generateNumbers()),
+      Draw(name: '16:00 Pm', numbers: generateNumbers()),
       Draw(name: '17:00 Pm', numbers: generateNumbers()),
+      Draw(name: '18:00 Pm', numbers: generateNumbers()),
+      Draw(name: '19:00 Pm', numbers: generateNumbers()),
 
       // Agrega los sorteos restantes para esta lotería
     ]),
@@ -151,7 +151,7 @@ class Loterias {
       Draw(name: '13:30 Pm', numbers: generateNumbers()),
       Draw(name: '14:30 Pm', numbers: generateNumbers()),
       Draw(name: '15:30 Pm', numbers: generateNumbers()),
-      Draw(name: '16.30 Pm', numbers: generateNumbers()),
+      Draw(name: '16:30 Pm', numbers: generateNumbers()),
       Draw(name: '17:30 Pm', numbers: generateNumbers()),
       Draw(name: '18:30 Pm', numbers: generateNumbers()),
       // Agrega los sorteos restantes para esta lotería

@@ -15,6 +15,7 @@ class TicketsHelper {
     return response.map((item) {
       return Ticket(
         codigoagencia: item['codigoagencia'] as String,
+        nombreagencia: item['codigoagencia'] as String,
         correousuario: item['taquilla'] as String,
         nroticket: item['nroticket'] as String,
         serial: item['serial'] as String,
@@ -33,6 +34,7 @@ class TicketsHelper {
     final response = await cliente.from('tickets').insert([
       {
         'codigoagencia': ticket.codigoagencia,
+        'nombreagencia': ticket.nombreagencia,
         'taquilla': ticket.correousuario,
         'nroticket': ticket.nroticket,
         'serial': ticket.serial,
@@ -48,6 +50,7 @@ class TicketsHelper {
 
   static Future<void> deleteTicket(
     String codigoagencia,
+    String nombreagencia,
     String correousuario,
     String nroticket,
     String fecha,
@@ -60,6 +63,7 @@ class TicketsHelper {
         .from('ticket')
         .delete()
         .eq('codigoagencia', codigoagencia)
+        .eq('nombreagencia', nombreagencia)
         .eq('taquilla', correousuario)
         .eq('nroticket', nroticket)
         .eq('fecha', fecha)

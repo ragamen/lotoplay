@@ -1,5 +1,6 @@
 class Ticket {
   String codigoagencia;
+  String nombreagencia;
   String correousuario;
   String nroticket;
   String serial;
@@ -12,6 +13,7 @@ class Ticket {
 
   Ticket({
     required this.codigoagencia,
+    required this.nombreagencia,
     required this.correousuario,
     required this.nroticket,
     required this.serial,

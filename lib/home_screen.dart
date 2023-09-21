@@ -1,3 +1,6 @@
+import 'package:esc_pos_printer/esc_pos_printer.dart';
+import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lotoplay/helper/actualizar_helper.dart';
 import 'package:lotoplay/helper/common.dart';
@@ -8,11 +11,12 @@ import 'package:lotoplay/models/draw.dart';
 import 'package:lotoplay/models/lottery.dart';
 import 'package:lotoplay/models/number.dart';
 import 'package:lotoplay/models/purchase.dart';
+import 'package:lotoplay/models/serialfactura.dart';
 import 'package:lotoplay/models_sp/agencia.dart';
 import 'package:lotoplay/models_sp/ticket.dart';
 import 'package:lotoplay/utils/lotteries.dart';
-import 'package:usb_thermal_printer_web/usb_thermal_printer_web.dart';
 import 'package:intl/intl.dart';
+import 'package:usb_thermal_printer_web/usb_thermal_printer_web.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -25,7 +29,7 @@ TextEditingController purchaseAmountController = TextEditingController();
 
 class _HomeScreenState extends State<HomeScreen> {
 //  var a = Loterias.lotteries;
-  final printer = WebThermalPrinter();
+//  final printer = WebThermalPrinter();
   List<Purchase> purchases = [];
 //  List<Agencia> agenciaActual = AgenciaActual.agenciaActual;
   Lottery? selectedLottery;
@@ -119,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String xfecha = '';
   String hora = '';
   String agencia = '';
+  bool serialkeys = true;
   @override
   void initState() {
     super.initState();
@@ -127,9 +132,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (purchases.isEmpty) {
-      obtenerSerial(
-          AgenciaActual.agenciaActual[0].codigoagencia, serial, nroTicket);
+    if (serialkeys) {
+      obtenerSerial(AgenciaActual.agenciaActual[0].codigoagencia);
+      serial = SerialFactura.sfLista[0].sfserial;
+      nroTicket = SerialFactura.sfLista[0].sfticket;
+      if (kDebugMode) {
+        print("TICKET  $nroTicket serial $serial");
+      }
+      serialkeys = false;
     }
     return Scaffold(
       appBar: AppBar(
@@ -189,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             newValue?.isSelected = !newValue.isSelected;
                             // Actualizar availableLotteries después de seleccionar la primera lotería
                             availableDraws = selectedLottery!.draws;
-                            availableDraws = getAvailableDraws();
+//   OOOOJOOOOO                            availableDraws = getAvailableDraws();
 
                             availableLotteries = getAvailableLotteries();
 //                            availableLotteries = availableLotteries
@@ -337,6 +347,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         number: number,
                         amount: purchaseAmount,
                       );
+/*                      if (kDebugMode) {
+                        print(
+                            'Ticket1 : ${SerialFactura.sfLista[0].sfticket}Serial1 :${SerialFactura.sfLista[0].sfserial}');
+                      }
+                      if (kDebugMode) {
+                        print('Ticket2 : ${nroTicket}Serial2 :$serial');
+                      }
+*/
                       final xxfecha = DateTime.now();
                       final formato = DateFormat('dd/MM/yyyy');
                       final fechaFormateada = formato.format(xxfecha);
@@ -347,10 +365,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ticket = Ticket(
                           codigoagencia:
                               AgenciaActual.agenciaActual[0].codigoagencia,
-                          correousuario:
-                              AgenciaActual.agenciaActual[0].correo, //correo!,
-                          nroticket: nroTicket.toString(),
-                          serial: serial.toString(),
+                          nombreagencia:
+                              AgenciaActual.agenciaActual[0].nombreagencia,
+                          correousuario: AgenciaActual.agenciaActual[0].correo,
+                          nroticket:
+                              SerialFactura.sfLista[0].sfticket.toString(),
+                          serial: SerialFactura.sfLista[0].sfserial.toString(),
                           fecha: xfecha,
                           hora: formattedTime,
                           loteria: lottery.name,
@@ -381,6 +401,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   selectedDraws = [];
                   selectedNumbers = [];
                   selectedLottery = null;
+                  selectedDraw = null;
+                  selectedNumber = null;
                   availableLotteries = getAvailableLotteries();
                   purchaseAmount = 0.0;
                   purchaseAmountController.text = '0.0';
@@ -415,7 +437,10 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 imprimirLista(
                     purchases, nroTicket, serial, agencia, xfecha, hora);
-                purchases.clear();
+                setState(() {
+                  purchases.clear();
+                  serialkeys = true;
+                });
                 // Lógica para enviar a impresión
               },
               child: const Text('Enviar a impresión'),
@@ -435,11 +460,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-void obtenerSerial(codagencia, nroSerial, numeroTicket) async {
+void obtenerSerial(codagencia) async {
   final response = await cliente
       .from('agencias')
       .select(
-          'codigoagencia,nombreagencia,direccion,banco,telefono,cedulaadmin,cupo,comision,nroticket,correo')
+          'codigoagencia,nombreagencia,direccion,correo,banco,telefono,cedulaadmin,cupo,comision,nroticket')
       .eq('codigoagencia', codagencia);
   var data1 = response.map((item) {
     return Agencia(
@@ -459,6 +484,7 @@ void obtenerSerial(codagencia, nroSerial, numeroTicket) async {
   await cliente.from('agencias').update({
     'nroticket': numeroTicket,
   }).eq('codigoagencia', codagencia);
+  SerialFactura.sfLista[0].sfticket = numeroTicket;
 
   final response1 = await cliente.from('banquero').select(
       'email,nombre,maximoanimal,maxterminal,maxtriple,maxtripleta,serial');
@@ -469,7 +495,10 @@ void obtenerSerial(codagencia, nroSerial, numeroTicket) async {
     data.add(Banquero.fromMap(response1[i]));
   }
   int nroSerial = data[0].serial + 1;
-  await cliente.from('banquero').update({'serial': nroSerial}).eq('id', 0);
+  await cliente
+      .from('banquero')
+      .update({'serial': nroSerial}).eq('email', data[0].email);
+  SerialFactura.sfLista[0].sfserial = nroSerial;
 }
 
 class PurchaseList extends StatelessWidget {
@@ -503,6 +532,7 @@ class PurchaseList extends StatelessWidget {
               onPressed: () {
                 final ticket = Ticket(
                   codigoagencia: AgenciaActual.agenciaActual[0].codigoagencia,
+                  nombreagencia: AgenciaActual.agenciaActual[0].nombreagencia,
                   correousuario: AgenciaActual.agenciaActual[0].correo,
                   nroticket: nroticket,
                   serial: serial,
@@ -528,7 +558,7 @@ void imprimirLista(purchases, nroticket, serial, agencia, fecha, hora) async {
   final printer = WebThermalPrinter();
 
   // Conectar a la impresora
-  await printer.pairDevice(vendorId: 0x6868, productId: 0x0200);
+  await printer.pairDevice(vendorId: 6868, productId: 0200);
 
   // Configurar estilos de impresión
   await printer.printText("", bold: true, centerAlign: true);
@@ -558,11 +588,6 @@ void imprimirLista(purchases, nroticket, serial, agencia, fecha, hora) async {
   await printer.printEmptyLine();
   await printer.printText('Total Bs. $total');
 
-/*  for (var usuario in purchases) {
-    await printer.printText(usuario.loteria);
-    await printer.printText(usuario.sorteo);
-  }*/
-
   // Cortar papel
   await printer.printText('Gracias por su compra.');
   await printer.printText('!!!!!!!!Suerte!!!!!!!!');
@@ -575,18 +600,19 @@ void imprimirLista(purchases, nroticket, serial, agencia, fecha, hora) async {
   // Desconectar de la impresora
   await printer.closePrinter();
 }
-/*  List<Purchase> purchases = [
-    Purchase(property1: "Propiedad 1", property2: "Propiedad 2"),
-    Purchase(property1: "Valor 1", property2: "Valor 2"),
-  ];
+/*
 
-  int maxLineLength = 20; // Ancho máximo del ticket
-
-  for (var purchase in purchases) {
-    String line = "${purchase.property1} ${purchase.property2}";
-    if (line.length > maxLineLength) {
-      line = line.substring(0, maxLineLength); // Ajustar la longitud máxima
-    }
-    print(line);
+void imprimirLista(purchases, nroticket, serial, agencia, fecha, hora) async {
+//const PaperSize paper = PaperSize.mm80;
+  const PaperSize paper = PaperSize.mm80;
+  final profile = await CapabilityProfile.load();
+  final printer = NetworkPrinter(paper, profile);
+  final PosPrintResult res = await printer.connect('192.168.0.123', port: 9100);
+  if (res == PosPrintResult.success) {
+    printer.text('¡Hola, mundo!');
+    printer.feed(2);
+    printer.cut();
+    printer.disconnect();
   }
-}*/
+}
+*/

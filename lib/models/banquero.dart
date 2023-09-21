@@ -1,4 +1,5 @@
 class Banquero {
+  String email;
   String nombre;
   double maximoanimal;
   double maxterminal;
@@ -7,6 +8,7 @@ class Banquero {
   int serial;
 
   Banquero({
+    required this.email,
     required this.nombre,
     required this.maximoanimal,
     required this.maxterminal,
@@ -16,6 +18,7 @@ class Banquero {
   });
   Map<String, dynamic> toMap() {
     return {
+      'email': email,
       'nombre': nombre,
       'maximoanimal': maximoanimal,
       'maxterminal': maxterminal,
@@ -26,7 +29,8 @@ class Banquero {
   }
 
   Banquero.fromMap(Map<String, dynamic> map)
-      : nombre = map["nombre"],
+      : email = map["email"],
+        nombre = map["nombre"],
         maximoanimal = map["maximoanimal"],
         maxterminal = map["maxterminal"],
         maxtriple = map["maxtriple"],

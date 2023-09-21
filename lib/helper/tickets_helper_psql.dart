@@ -25,6 +25,7 @@ class TicketsHelperPsql {
     var tickets = results.map((row) {
       return Ticket(
         codigoagencia: row[0],
+        nombreagencia: row[0],
         correousuario: row[1],
         nroticket: row[2],
         serial: row[3],
@@ -49,6 +50,7 @@ class TicketsHelperPsql {
         'VALUES (@agencia,@nroticket,(@serial,(@fecha,(@hora, @loteria, @sorteo, @numero, @monto)',
         substitutionValues: {
           'agencia': ticket.codigoagencia,
+          'nombreagencia': ticket.nombreagencia,
           'taquilla': ticket.correousuario,
           'nroTicket': ticket.nroticket,
           'serial': ticket.serial,
@@ -72,6 +74,7 @@ class TicketsHelperPsql {
       'UPDATE tickets SET jugada = @jugada, maximo = @maximo WHERE fecha = @fecha AND loteria = @loteria AND sorteo = @sorteo AND numero = @numero',
       substitutionValues: {
         'agencia': ticket.codigoagencia,
+        'nombreagencia': ticket.nombreagencia,
         'taquilla': ticket.correousuario,
         'nroTicket': ticket.nroticket,
         'serial': ticket.serial,
@@ -90,6 +93,7 @@ class TicketsHelperPsql {
       'DELETE FROM tickets WHERE fecha = @ticket.fecha AND loteria = @ticket.loteria AND sorteo = @ticket.sorteo AND numero = @ticket.numero',
       substitutionValues: {
         'agencia': ticket.codigoagencia,
+        'nombreagencia': ticket.nombreagencia,
         'taquilla': ticket.correousuario,
         'nroTicket': ticket.nroticket,
         'serial': ticket.serial,

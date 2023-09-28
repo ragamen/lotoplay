@@ -1,14 +1,15 @@
-//import 'package:esc_pos_printer/esc_pos_printer.dart';
-//import 'package:esc_pos_utils/esc_pos_utils.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:lotoplay/helper/actualizar_helper.dart';
+import 'package:lotoplay/helper/actualizar_ticket.dart';
 import 'package:lotoplay/helper/common.dart';
 import 'package:lotoplay/helper/rliminar_helper.dart';
 import 'package:lotoplay/models/agencialista.dart';
 import 'package:lotoplay/models/banquero.dart';
 import 'package:lotoplay/models/draw.dart';
 import 'package:lotoplay/models/lottery.dart';
+import 'package:lotoplay/models/new_purchase.dart';
 import 'package:lotoplay/models/number.dart';
 import 'package:lotoplay/models/purchase.dart';
 import 'package:lotoplay/models/serialfactura.dart';
@@ -16,7 +17,8 @@ import 'package:lotoplay/models_sp/agencia.dart';
 import 'package:lotoplay/models_sp/ticket.dart';
 import 'package:lotoplay/utils/lotteries.dart';
 import 'package:intl/intl.dart';
-import 'package:usb_thermal_printer_web/usb_thermal_printer_web.dart';
+import 'package:http/http.dart' as http;
+//import 'package:usb_thermal_printer_web/usb_thermal_printer_web.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -127,20 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
     availableLotteries = getAvailableLotteries();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (serialkeys) {
-      obtenerSerial(AgenciaActual.agenciaActual[0].codigoagencia);
-      serial = SerialFactura.sfLista[0].sfserial;
-      nroTicket = SerialFactura.sfLista[0].sfticket;
-      if (kDebugMode) {
-        print("TICKET  $nroTicket serial $serial");
-      }
-      serialkeys = false;
-    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ventas de Loterías'),
@@ -199,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             newValue?.isSelected = !newValue.isSelected;
                             // Actualizar availableLotteries después de seleccionar la primera lotería
                             availableDraws = selectedLottery!.draws;
-//   OOOOJOOOOO                            availableDraws = getAvailableDraws();
+                            availableDraws = getAvailableDraws();
 
                             availableLotteries = getAvailableLotteries();
 //                            availableLotteries = availableLotteries
@@ -355,6 +349,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         print('Ticket2 : ${nroTicket}Serial2 :$serial');
                       }
 */
+                      obtenerSerial(
+                          AgenciaActual.agenciaActual[0].codigoagencia);
+                      serial = SerialFactura.sfLista[0].sfserial;
+                      nroTicket = SerialFactura.sfLista[0].sfticket;
                       final xxfecha = DateTime.now();
                       final formato = DateFormat('dd/MM/yyyy');
                       final fechaFormateada = formato.format(xxfecha);
@@ -362,6 +360,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       String formattedTime = DateFormat.Hms().format(xxfecha);
                       hora = formattedTime;
                       agencia = AgenciaActual.agenciaActual[0].nombreagencia;
+
                       ticket = Ticket(
                           codigoagencia:
                               AgenciaActual.agenciaActual[0].codigoagencia,
@@ -373,12 +372,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           serial: SerialFactura.sfLista[0].sfserial.toString(),
                           fecha: xfecha,
                           hora: formattedTime,
-                          loteria: lottery.name,
-                          sorteo: draw.name,
-                          numero: number.value,
+                          loteria: purchase.lottery.name,
+                          sorteo: purchase.draw.name,
+                          numero: purchase.number.value,
                           monto: purchaseAmount);
-
                       ActualizarHelper.actualizar(ticket);
+
                       setState(() {
                         purchases.add(purchase);
                       });
@@ -435,6 +434,35 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
+                obtenerSerial(AgenciaActual.agenciaActual[0].codigoagencia);
+                serial = SerialFactura.sfLista[0].sfserial;
+                nroTicket = SerialFactura.sfLista[0].sfticket;
+                final xxfecha = DateTime.now();
+                final formato = DateFormat('dd/MM/yyyy');
+                final fechaFormateada = formato.format(xxfecha);
+                xfecha = fechaFormateada;
+                String formattedTime = DateFormat.Hms().format(xxfecha);
+                hora = formattedTime;
+                agencia = AgenciaActual.agenciaActual[0].nombreagencia;
+                int count = purchases.length;
+                for (int i = 0; i < count; i++) {
+                  final compras = purchases[i];
+                  ticket = Ticket(
+                      codigoagencia:
+                          AgenciaActual.agenciaActual[0].codigoagencia,
+                      nombreagencia:
+                          AgenciaActual.agenciaActual[0].nombreagencia,
+                      correousuario: AgenciaActual.agenciaActual[0].correo,
+                      nroticket: SerialFactura.sfLista[0].sfticket.toString(),
+                      serial: SerialFactura.sfLista[0].sfserial.toString(),
+                      fecha: xfecha,
+                      hora: formattedTime,
+                      loteria: compras.lottery.name,
+                      sorteo: compras.draw.name,
+                      numero: compras.number.value,
+                      monto: purchaseAmount);
+                  ActualizarTicketHelper.actualizar(ticket);
+                }
                 imprimirLista(
                     purchases, nroTicket, serial, agencia, xfecha, hora);
                 setState(() {
@@ -555,64 +583,32 @@ class PurchaseList extends StatelessWidget {
 }
 
 void imprimirLista(purchases, nroticket, serial, agencia, fecha, hora) async {
-  final printer = WebThermalPrinter();
-
-  // Conectar a la impresora
-  await printer.pairDevice(vendorId: 6868, productId: 0200);
-
-  // Configurar estilos de impresión
-  await printer.printText("", bold: true, centerAlign: true);
-  // printer.;
-
-  // Imprimir encabezado
-  await printer.printText('Agencia : $agencia');
-  await printer.printText('Ticket $nroticket Serial $serial');
-  await printer.printText('fecha $fecha Hora $hora');
-
-  // Iterar sobre tu lista de nombres y direcciones
-  int maxLineLength = 20; // Ancho máximo del ticket
-  double total = 0.0;
-  for (var purchase in purchases) {
-    String line = "Loteria ${purchase.lottery} ";
-    if (line.length > maxLineLength) {
-      line = line.substring(0, maxLineLength); // Ajustar la longitud máxima
-    }
-    String line0 = "${purchase.draw} ${purchase.number} ${purchase.amount}";
-    if (line0.length > maxLineLength) {
-      line0 = line0.substring(0, maxLineLength); // Ajustar la longitud máxima
-    }
-    total = total + purchase.amount;
-    await printer.printText(line);
-    await printer.printText(line0);
+  var url = 'http://localhost/ticket.php';
+  // var headers = {'Content-Type': 'application/json'};
+  List<NewPurchase> newPurchase = [];
+  var count = purchases.length;
+  for (int i = 0; i < count; i++) {
+    newPurchase.add(NewPurchase(
+      lottery: purchases[i].lottery.name,
+      draw: purchases[i].draw.name,
+      number: purchases[i].number.value,
+      amount: purchases[i].amount.toString(),
+    ));
   }
-  await printer.printEmptyLine();
-  await printer.printText('Total Bs. $total');
+  var body = {
+    'nombre_impresora': 'tickera',
+    'companyName': agencia,
+    'date': fecha,
+    'time': hora,
+    'invoice': nroticket.toString(),
+    'serial': serial.toString(),
+    'lotteries': jsonEncode(newPurchase),
+  };
+  var response = await http.post(Uri.parse(url), body: body);
 
-  // Cortar papel
-  await printer.printText('Gracias por su compra.');
-  await printer.printText('!!!!!!!!Suerte!!!!!!!!');
-
-  await printer.printText('Vence a los tres dias');
-
-  await printer.printEmptyLine();
-//  printer.cut();
-
-  // Desconectar de la impresora
-  await printer.closePrinter();
-}
-/*
-
-void imprimirLista(purchases, nroticket, serial, agencia, fecha, hora) async {
-//const PaperSize paper = PaperSize.mm80;
-  const PaperSize paper = PaperSize.mm80;
-  final profile = await CapabilityProfile.load();
-  final printer = NetworkPrinter(paper, profile);
-  final PosPrintResult res = await printer.connect('192.168.0.123', port: 9100);
-  if (res == PosPrintResult.success) {
-    printer.text('¡Hola, mundo!');
-    printer.feed(2);
-    printer.cut();
-    printer.disconnect();
+  if (response.statusCode == 200) {
+    print('Impresión exitosa');
+  } else {
+    print('Error en la solicitud HTTP: ${response.statusCode}');
   }
 }
-*/

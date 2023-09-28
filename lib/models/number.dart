@@ -3,6 +3,12 @@ class Number {
   bool isSelected;
 
   Number({required this.value, this.isSelected = false});
+  Map<String, dynamic> toJson() {
+    return {
+      'value': value, // o double.parse(value) si es decimal
+      'isSelected': isSelected,
+    };
+  }
 
   @override
   int get hashCode => value.hashCode;

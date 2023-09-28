@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
-  charset_converter
   url_launcher_windows
 )
 

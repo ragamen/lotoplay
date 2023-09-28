@@ -11,6 +11,13 @@ class Draw {
       required this.numbers,
       this.isSelected = false,
       this.isActive = true});
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'numbers': numbers.map((number) => number.toJson()).toList(),
+      'isSelected': isSelected,
+    };
+  }
 
   @override
   int get hashCode => name.hashCode;

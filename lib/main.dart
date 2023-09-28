@@ -67,12 +67,6 @@ class _MyWidgetState extends State<MyWidget> {
   Widget build(BuildContext context) {
     if (!(_user == null)) {
       leerAgencia(_user?.email);
-      if (!vinculado) {
-        AgenciaActual.agenciaActual = List.empty();
-        _user = null;
-        vinculado = false;
-        cliente.auth.signOut();
-      }
     }
     return Scaffold(
       appBar: AppBar(
@@ -105,18 +99,18 @@ class _MyWidgetState extends State<MyWidget> {
           agencia.add(Agencia.fromMap(response[i]));
         }
         AgenciaActual.agenciaActual = agencia;
-        setState(() {
-          vinculado = true;
-        });
+//        setState(() {
+        vinculado = true;
+        //       });
       } else {
-        setState(() {
-          vinculado = false;
-        });
+        //       setState(() {
+        vinculado = false;
+        AgenciaActual.agenciaActual = List.empty();
+        _user = null;
+        cliente.auth.signOut();
+        //     });
       }
     } catch (e) {
-      setState(() {
-        vinculado = false;
-      });
       //
     }
   }

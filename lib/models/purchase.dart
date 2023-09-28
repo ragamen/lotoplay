@@ -15,4 +15,12 @@ class Purchase {
     required this.number,
     required this.amount,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'lottery': lottery,
+      'draw': draw,
+      'number': number,
+      'amount': amount,
+    };
+  }
 }

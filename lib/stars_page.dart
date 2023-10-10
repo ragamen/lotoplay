@@ -35,7 +35,7 @@ class _StartPageState extends State<StartPage> {
             height: 400,
             width: 400,
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 9, 209, 244),
+              color: const Color.fromARGB(255, 153, 239, 165),
               borderRadius: BorderRadius.circular(20),
               boxShadow: const [
                 BoxShadow(

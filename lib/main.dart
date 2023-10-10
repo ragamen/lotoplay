@@ -3,7 +3,9 @@
 import 'package:flutter/material.dart';
 //import 'package:lotoplay/helper/agencia_helper.dart';
 import 'package:lotoplay/helper/common.dart';
+//import 'package:lotoplay/home_menu.dart';
 import 'package:lotoplay/home_screen.dart';
+//import 'package:lotoplay/home_screen.dart';
 import 'package:lotoplay/models/agencialista.dart';
 import 'package:lotoplay/models_sp/agencia.dart';
 import 'package:lotoplay/stars_page.dart';
@@ -70,18 +72,86 @@ class _MyWidgetState extends State<MyWidget> {
     }
     return Scaffold(
       appBar: AppBar(
-          title: const Text("Ventas de Loterías"),
-          leading: IconButton(
-            onPressed: () {
-              setState(() {
-                cliente.auth.signOut();
-              });
-            },
-            icon: const Icon(
-              Icons.arrow_back, // add custom icons also
+        iconTheme: const IconThemeData(
+          color: Colors.black, // Cambia el color del icono aquí
+        ),
+        backgroundColor: Colors.yellow,
+        title: const Text(
+          "Ventas de Loterías",
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
+
+      drawer: _user == null
+          ? null
+          : Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  Container(
+                    constraints: const BoxConstraints(
+                      maxHeight: 80,
+                    ),
+                    child: const DrawerHeader(
+                      decoration: BoxDecoration(color: Colors.yellow),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Modulos Alternos",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          //               SizedBox(height: 100,child: Image.file(File("C:/Users/Luis/Desktop/cuaderno/cuaderno/.dart_tool/sqflite_common_ffi/imagenes/tiendas/tienda02.png"))),
+                        ],
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text(
+                      'Venta de animalitos',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomeScreen()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: const Text(
+                      'Resultados y premiacion',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    onTap: () {
+                      //      const EndSession();
+                      // Navega a la página 2
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomeScreen()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('Cerrar Sesion'),
+                    onTap: () {
+                      //      const EndSession();
+                      // Navega a la página 2
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const EndSession()),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          )),
-      body: _user == null ? const StartPage() : const HomeScreen(),
+
+      body: _user == null ? const StartPage() : null,
+//      const HomeMenu(),
     );
   }
 
@@ -113,5 +183,15 @@ class _MyWidgetState extends State<MyWidget> {
     } catch (e) {
       //
     }
+  }
+}
+
+class EndSession extends StatelessWidget {
+  const EndSession({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    cliente.auth.signOut();
+    return const MyWidget();
   }
 }

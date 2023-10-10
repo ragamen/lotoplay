@@ -137,7 +137,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ventas de Loterías'),
+        iconTheme: const IconThemeData(
+          color: Colors.black, // Cambia el color del icono aquí
+        ),
+        backgroundColor: Colors.yellow,
+        title: const Text(
+          'Ventas de Loterías',
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
       ),
       body: Padding(
@@ -329,86 +336,98 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                for (Lottery lottery in selectedLotteries) {
-                  for (Draw draw in selectedDraws) {
-                    for (Number number in selectedNumbers) {
-                      Purchase purchase = Purchase(
-                        lottery: lottery,
-                        draw: draw,
-                        number: number,
-                        amount: purchaseAmount,
-                      );
-/*                      if (kDebugMode) {
-                        print(
-                            'Ticket1 : ${SerialFactura.sfLista[0].sfticket}Serial1 :${SerialFactura.sfLista[0].sfserial}');
-                      }
-                      if (kDebugMode) {
-                        print('Ticket2 : ${nroTicket}Serial2 :$serial');
-                      }
-*/
-                      obtenerSerial(
-                          AgenciaActual.agenciaActual[0].codigoagencia);
-                      serial = SerialFactura.sfLista[0].sfserial;
-                      nroTicket = SerialFactura.sfLista[0].sfticket;
-                      final xxfecha = DateTime.now();
-                      final formato = DateFormat('dd/MM/yyyy');
-                      final fechaFormateada = formato.format(xxfecha);
-                      xfecha = fechaFormateada;
-                      String formattedTime = DateFormat.Hms().format(xxfecha);
-                      hora = formattedTime;
-                      agencia = AgenciaActual.agenciaActual[0].nombreagencia;
+            const SizedBox(height: 8.0),
+            SizedBox(
+              width: 100,
+              height: 35,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.yellow, // Background color
+                ),
+                onPressed: () {
+                  for (Lottery lottery in selectedLotteries) {
+                    for (Draw draw in selectedDraws) {
+                      for (Number number in selectedNumbers) {
+                        Purchase purchase = Purchase(
+                          lottery: lottery,
+                          draw: draw,
+                          number: number,
+                          amount: purchaseAmount,
+                        );
+                        /*                      if (kDebugMode) {
+                          print(
+                              'Ticket1 : ${SerialFactura.sfLista[0].sfticket}Serial1 :${SerialFactura.sfLista[0].sfserial}');
+                        }
+                        if (kDebugMode) {
+                          print('Ticket2 : ${nroTicket}Serial2 :$serial');
+                        }
+            */
+                        obtenerSerial(
+                            AgenciaActual.agenciaActual[0].codigoagencia);
+                        serial = SerialFactura.sfLista[0].sfserial;
+                        nroTicket = SerialFactura.sfLista[0].sfticket;
+                        final xxfecha = DateTime.now();
+                        final formato = DateFormat('dd/MM/yyyy');
+                        final fechaFormateada = formato.format(xxfecha);
+                        xfecha = fechaFormateada;
+                        String formattedTime = DateFormat.Hms().format(xxfecha);
+                        hora = formattedTime;
+                        agencia = AgenciaActual.agenciaActual[0].nombreagencia;
 
-                      ticket = Ticket(
-                          codigoagencia:
-                              AgenciaActual.agenciaActual[0].codigoagencia,
-                          nombreagencia:
-                              AgenciaActual.agenciaActual[0].nombreagencia,
-                          correousuario: AgenciaActual.agenciaActual[0].correo,
-                          nroticket:
-                              SerialFactura.sfLista[0].sfticket.toString(),
-                          serial: SerialFactura.sfLista[0].sfserial.toString(),
-                          fecha: xfecha,
-                          hora: formattedTime,
-                          loteria: purchase.lottery.name,
-                          sorteo: purchase.draw.name,
-                          numero: purchase.number.value,
-                          monto: purchaseAmount);
-                      ActualizarHelper.actualizar(ticket);
+                        ticket = Ticket(
+                            codigoagencia:
+                                AgenciaActual.agenciaActual[0].codigoagencia,
+                            nombreagencia:
+                                AgenciaActual.agenciaActual[0].nombreagencia,
+                            correousuario:
+                                AgenciaActual.agenciaActual[0].correo,
+                            nroticket:
+                                SerialFactura.sfLista[0].sfticket.toString(),
+                            serial:
+                                SerialFactura.sfLista[0].sfserial.toString(),
+                            fecha: xfecha,
+                            hora: formattedTime,
+                            loteria: purchase.lottery.name,
+                            sorteo: purchase.draw.name,
+                            numero: purchase.number.value,
+                            monto: purchaseAmount);
+                        ActualizarHelper.actualizar(ticket);
 
-                      setState(() {
-                        purchases.add(purchase);
-                      });
+                        setState(() {
+                          purchases.add(purchase);
+                        });
+                      }
                     }
                   }
-                }
-                for (Lottery lottery in selectedLotteries) {
-                  lottery.isSelected = false;
-                }
+                  for (Lottery lottery in selectedLotteries) {
+                    lottery.isSelected = false;
+                  }
 
-                for (Draw draw in selectedDraws) {
-                  draw.isSelected = false;
-                }
+                  for (Draw draw in selectedDraws) {
+                    draw.isSelected = false;
+                  }
 
-                for (Number number in selectedNumbers) {
-                  number.isSelected = false;
-                }
-                setState(() {
-                  selectedLotteries = [];
-                  selectedDraws = [];
-                  selectedNumbers = [];
-                  selectedLottery = null;
-                  selectedDraw = null;
-                  selectedNumber = null;
-                  availableLotteries = getAvailableLotteries();
-                  purchaseAmount = 0.0;
-                  purchaseAmountController.text = '0.0';
-                  purchaseAmountController.clear();
-                });
-              },
-              child: const Text('Agregar a la lista de compras'),
+                  for (Number number in selectedNumbers) {
+                    number.isSelected = false;
+                  }
+                  setState(() {
+                    selectedLotteries = [];
+                    selectedDraws = [];
+                    selectedNumbers = [];
+                    selectedLottery = null;
+                    selectedDraw = null;
+                    selectedNumber = null;
+                    availableLotteries = getAvailableLotteries();
+                    purchaseAmount = 0.0;
+                    purchaseAmountController.text = '0.0';
+                    purchaseAmountController.clear();
+                  });
+                },
+                child: const Text(
+                  'Agregar a la lista de compras',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
             ),
             const SizedBox(height: 16.0),
             Expanded(
@@ -433,6 +452,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                fixedSize: const Size(
+                    120, 25), // Ajusta el ancho y alto según tus necesidades
+                backgroundColor: Colors.yellow,
+              ),
               onPressed: () {
                 obtenerSerial(AgenciaActual.agenciaActual[0].codigoagencia);
                 serial = SerialFactura.sfLista[0].sfserial;
@@ -471,7 +495,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
                 // Lógica para enviar a impresión
               },
-              child: const Text('Enviar a impresión'),
+              child: const Text(
+                'Enviar a impresión',
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           ],
         ),

@@ -24,17 +24,18 @@ class TicketsHelperPsql {
     final results = await _connection!.query('SELECT * FROM tickets');
     var tickets = results.map((row) {
       return Ticket(
-        codigoagencia: row[0],
-        nombreagencia: row[0],
-        correousuario: row[1],
-        nroticket: row[2],
-        serial: row[3],
-        fecha: row[4],
-        hora: row[5],
-        loteria: row[6],
-        sorteo: row[7],
-        numero: row[8],
-        monto: row[9],
+        codigofranquicia: row[0],
+        codigoagencia: row[1],
+        nombreagencia: row[2],
+        correousuario: row[3],
+        nroticket: row[4],
+        serial: row[5],
+        fecha: row[6],
+        hora: row[7],
+        loteria: row[8],
+        sorteo: row[9],
+        numero: row[10],
+        monto: row[11],
       );
     }).toList();
     return tickets;

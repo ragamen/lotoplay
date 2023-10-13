@@ -1,5 +1,6 @@
 import 'package:lotoplay/helper/common.dart';
 import 'package:lotoplay/models_sp/apuesta_agencia.dart';
+import 'package:lotoplay/models_sp/apuesta_franquicia.dart';
 import 'package:lotoplay/models_sp/apuesta_general.dart';
 
 class ActualizarHelper {
@@ -75,9 +76,90 @@ class ActualizarHelper {
           .eq('numero', apuestaGeneral.numero);
     }
 //
+// Actualizar ApuestaFraquicia
+//
+
+    final response1 = await cliente
+        .from('apuestafranquicia')
+        .select()
+        .eq('codigofranquicia', ticket.codigofranquicia)
+        .eq('fecha', ticket.fecha)
+        .eq('loteria', ticket.loteria)
+        .eq('sorteo', ticket.sorteo)
+        .eq('numero', ticket.numero);
+    count = response1.length;
+    List<ApuestaFranquicia> data1 = [];
+    for (int i = 0; i < count; i++) {
+      data1.add(ApuestaFranquicia.fromMap(response1[i]));
+    }
+    // ignore: dead_code
+    if (data1.isEmpty) {
+      var apuestaFranquicia = ApuestaFranquicia(
+        codigofranquicia: ticket.codigofranquicia,
+        fecha: ticket.fecha,
+        loteria: ticket.loteria,
+        sorteo: ticket.sorteo,
+        numero: ticket.numero,
+        jugada: ticket.monto.toString(),
+        maximo: '0',
+        premio: '0',
+        activo: true,
+      );
+
+      await cliente.from('apuestafranquicia').insert([
+        {
+          'codigofranquicia': apuestaFranquicia.codigofranquicia,
+          'fecha': apuestaFranquicia.fecha,
+          'loteria': apuestaFranquicia.loteria,
+          'sorteo': apuestaFranquicia.sorteo,
+          'numero': apuestaFranquicia.numero,
+          'jugada': apuestaFranquicia.jugada,
+          'maximo': apuestaFranquicia.maximo,
+          'premio': apuestaFranquicia.premio,
+          'activo': apuestaFranquicia.activo,
+        }
+      ]);
+    } else {
+      var njugada =
+          double.parse(data1[0].maximo) - double.parse(data1[0].jugada);
+      if (njugada >= ticket.monto) {
+        ticket.monto = ticket.monto;
+      }
+      if (njugada < ticket.monto) {
+        ticket.monto = njugada;
+      }
+      if (njugada <= 0) {
+        ticket.monto = 0;
+      }
+      var resultado = ticket.monto + double.parse(data1[0].jugada);
+      var apuestaFranquicia = ApuestaFranquicia(
+        codigofranquicia: ticket.codigofranquicia,
+        fecha: ticket.fecha,
+        loteria: ticket.loteria,
+        sorteo: ticket.sorteo,
+        numero: ticket.numero,
+        jugada: resultado.toString(),
+        maximo: data1[0].maximo.toString(),
+        premio: data1[0].premio.toString(),
+        activo: data1[0].activo,
+      );
+      await cliente
+          .from('apuestafranquicia')
+          .update({
+            'jugada': apuestaFranquicia.jugada,
+            'maximo': apuestaFranquicia.maximo,
+          })
+          .eq('codigofranquicia', apuestaFranquicia.codigofranquicia)
+          .eq('fecha', apuestaFranquicia.fecha)
+          .eq('loteria', apuestaFranquicia.loteria)
+          .eq('sorteo', apuestaFranquicia.sorteo)
+          .eq('numero', apuestaFranquicia.numero);
+    }
+
+//
 // Actualizar Apuesta Agencia
 //
-    final response1 = await cliente
+    final response2 = await cliente
         .from('apuestaagencia')
         .select()
         .eq('codigoagencia', ticket.codigoagencia)
@@ -85,13 +167,13 @@ class ActualizarHelper {
         .eq('loteria', ticket.loteria)
         .eq('sorteo', ticket.sorteo)
         .eq('numero', ticket.numero);
-    count = response1.length;
-    List<ApuestaGeneral> data1 = [];
+    count = response2.length;
+    List<ApuestaAgencia> data2 = [];
     for (int i = 0; i < count; i++) {
-      data1.add(ApuestaGeneral.fromMap(response1[i]));
+      data2.add(ApuestaAgencia.fromMap(response2[i]));
     }
     // ignore: dead_code
-    if (data1.isEmpty) {
+    if (data2.isEmpty) {
       var apuestaAgencia = ApuestaAgencia(
         codigoagencia: ticket.codigoagencia,
         fecha: ticket.fecha,

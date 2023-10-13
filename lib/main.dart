@@ -160,7 +160,7 @@ class _MyWidgetState extends State<MyWidget> {
       final response = await cliente
           .from('agencias')
           .select(
-              'codigoagencia,nombreagencia,direccion,correo,banco,telefono,cedulaadmin,cupo,comision,nroticket,serial')
+              'codigofranquicia,codigoagencia,nombreagencia,direccion,correo,banco,telefono,cedulaadmin,cupo,comision,nroticket,serial')
           .eq('correo', correo);
       if (response.length == 1) {
         int count = response.length;

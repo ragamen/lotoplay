@@ -129,7 +129,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
     availableLotteries = getAvailableLotteries();
   }
 
@@ -200,12 +199,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             newValue?.isSelected = !newValue.isSelected;
                             // Actualizar availableLotteries después de seleccionar la primera lotería
                             availableDraws = selectedLottery!.draws;
-                            availableDraws = getAvailableDraws();
+//quitar                            availableDraws = getAvailableDraws();
 
                             availableLotteries = getAvailableLotteries();
-//                            availableLotteries = availableLotteries
-//                                .where((lottery) => lottery != newValue)
-//                                .toList();
                           });
                         },
                         items: availableLotteries.map((Lottery lottery) {
@@ -354,14 +350,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           number: number,
                           amount: purchaseAmount,
                         );
-                        /*                      if (kDebugMode) {
-                          print(
-                              'Ticket1 : ${SerialFactura.sfLista[0].sfticket}Serial1 :${SerialFactura.sfLista[0].sfserial}');
-                        }
-                        if (kDebugMode) {
-                          print('Ticket2 : ${nroTicket}Serial2 :$serial');
-                        }
-            */
                         obtenerSerial(
                             AgenciaActual.agenciaActual[0].codigoagencia);
                         serial = SerialFactura.sfLista[0].sfserial;
@@ -373,8 +361,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         String formattedTime = DateFormat.Hms().format(xxfecha);
                         hora = formattedTime;
                         agencia = AgenciaActual.agenciaActual[0].nombreagencia;
-
                         ticket = Ticket(
+                            codigofranquicia:
+                                AgenciaActual.agenciaActual[0].codigofranquicia,
                             codigoagencia:
                                 AgenciaActual.agenciaActual[0].codigoagencia,
                             nombreagencia:
@@ -392,7 +381,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             numero: purchase.number.value,
                             monto: purchaseAmount);
                         ActualizarHelper.actualizar(ticket);
-
                         setState(() {
                           purchases.add(purchase);
                         });
@@ -472,6 +460,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 for (int i = 0; i < count; i++) {
                   final compras = purchases[i];
                   ticket = Ticket(
+                      codigofranquicia:
+                          AgenciaActual.agenciaActual[0].codigofranquicia,
                       codigoagencia:
                           AgenciaActual.agenciaActual[0].codigoagencia,
                       nombreagencia:
@@ -487,8 +477,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       monto: purchaseAmount);
                   ActualizarTicketHelper.actualizar(ticket);
                 }
-                imprimirLista(
-                    purchases, nroTicket, serial, agencia, xfecha, hora);
+//                imprimirLista(
+//                    purchases, nroTicket, serial, agencia, xfecha, hora);
                 setState(() {
                   purchases.clear();
                   serialkeys = true;
@@ -519,10 +509,11 @@ void obtenerSerial(codagencia) async {
   final response = await cliente
       .from('agencias')
       .select(
-          'codigoagencia,nombreagencia,direccion,correo,banco,telefono,cedulaadmin,cupo,comision,nroticket')
+          'codigofranquicia,codigoagencia,nombreagencia,direccion,correo,banco,telefono,cedulaadmin,cupo,comision,nroticket')
       .eq('codigoagencia', codagencia);
   var data1 = response.map((item) {
     return Agencia(
+      codigofranquicia: item['codigofranquicia'] as String,
       codigoagencia: item['codigoagencia'] as String,
       nombreagencia: item['nombreagencia'] as String,
       direccion: item['direccion'] as String,
@@ -586,6 +577,8 @@ class PurchaseList extends StatelessWidget {
               icon: const Icon(Icons.delete),
               onPressed: () {
                 final ticket = Ticket(
+                  codigofranquicia:
+                      AgenciaActual.agenciaActual[0].codigofranquicia,
                   codigoagencia: AgenciaActual.agenciaActual[0].codigoagencia,
                   nombreagencia: AgenciaActual.agenciaActual[0].nombreagencia,
                   correousuario: AgenciaActual.agenciaActual[0].correo,

@@ -1,4 +1,5 @@
 class Ticket {
+  String codigofranquicia;
   String codigoagencia;
   String nombreagencia;
   String correousuario;
@@ -12,6 +13,7 @@ class Ticket {
   double monto;
 
   Ticket({
+    required this.codigofranquicia,
     required this.codigoagencia,
     required this.nombreagencia,
     required this.correousuario,

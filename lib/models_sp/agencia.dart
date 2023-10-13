@@ -1,4 +1,5 @@
 class Agencia {
+  String codigofranquicia;
   String codigoagencia;
   String nombreagencia;
   String direccion;
@@ -11,6 +12,7 @@ class Agencia {
   int nroticket;
 
   Agencia({
+    required this.codigofranquicia,
     required this.codigoagencia,
     required this.nombreagencia,
     required this.direccion,
@@ -24,6 +26,7 @@ class Agencia {
   });
   Map<String, dynamic> toMap() {
     return {
+      'codigofranquicia': codigofranquicia,
       'codigoagencia': codigoagencia,
       'nombreagencia': nombreagencia,
       'direccion': direccion,
@@ -38,7 +41,8 @@ class Agencia {
   }
 
   Agencia.fromMap(Map<String, dynamic> map)
-      : codigoagencia = map["codigoagencia"],
+      : codigofranquicia = map["codigofranquicia"],
+        codigoagencia = map["codigoagencia"],
         nombreagencia = map["nombreagencia"],
         direccion = map["direccion"],
         correo = map["correo"],

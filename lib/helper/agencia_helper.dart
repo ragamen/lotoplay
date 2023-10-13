@@ -11,6 +11,7 @@ class AgenciaHelper {
         .eq('codigoagencia', codagencia);
     return AgenciaActual.agenciaActual = response.map((item) {
       return Agencia(
+        codigofranquicia: item['codigofranquicia'] as String,
         codigoagencia: item['codigoagencia'] as String,
         nombreagencia: item['nombreagencia'] as String,
         direccion: item['direccion'] as String,

@@ -14,6 +14,7 @@ class TicketsHelper {
 */
     return response.map((item) {
       return Ticket(
+        codigofranquicia: item['codigofranquicia'] as String,
         codigoagencia: item['codigoagencia'] as String,
         nombreagencia: item['codigoagencia'] as String,
         correousuario: item['taquilla'] as String,
@@ -33,6 +34,7 @@ class TicketsHelper {
     // ignore: unused_local_variable
     final response = await cliente.from('tickets').insert([
       {
+        'codigofranquicia': ticket.codigofranquicia,
         'codigoagencia': ticket.codigoagencia,
         'nombreagencia': ticket.nombreagencia,
         'taquilla': ticket.correousuario,
@@ -49,6 +51,7 @@ class TicketsHelper {
   }
 
   static Future<void> deleteTicket(
+    String codigofranquicia,
     String codigoagencia,
     String nombreagencia,
     String correousuario,
@@ -62,6 +65,7 @@ class TicketsHelper {
     final response = await cliente
         .from('ticket')
         .delete()
+        .eq('codigofranquicia', codigofranquicia)
         .eq('codigoagencia', codigoagencia)
         .eq('nombreagencia', nombreagencia)
         .eq('taquilla', correousuario)

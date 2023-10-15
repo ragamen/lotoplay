@@ -11,7 +11,7 @@ class Ticket {
   String sorteo;
   String numero;
   double monto;
-
+  double premio;
   Ticket({
     required this.codigofranquicia,
     required this.codigoagencia,
@@ -25,5 +25,6 @@ class Ticket {
     required this.sorteo,
     required this.numero,
     required this.monto,
+    required this.premio,
   });
 }

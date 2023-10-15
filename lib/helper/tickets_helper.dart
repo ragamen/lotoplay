@@ -3,7 +3,7 @@ import 'package:lotoplay/models_sp/ticket.dart';
 
 class TicketsHelper {
   static Future<List<Ticket>> getTickets() async {
-    final response = await cliente.from('Tickets').select();
+    final response = await cliente.from('tickets').select();
 
 /*
     if (response.error != null) {
@@ -26,6 +26,7 @@ class TicketsHelper {
         sorteo: item['sorteo'] as String,
         numero: item['numero'] as String,
         monto: item['monto'] as double,
+        premio: item['premio'] as double,
       );
     }).toList();
   }
@@ -46,6 +47,7 @@ class TicketsHelper {
         'sorteo': ticket.sorteo,
         'numero': ticket.numero,
         'monto': ticket.monto,
+        'premio': ticket.premio,
       }
     ]);
   }
@@ -74,6 +76,7 @@ class TicketsHelper {
         .eq('loteria', loteria)
         .eq('sorteo', sorteo)
         .eq('numero', numero);
+
     if (response.error != null) {
       throw response.error!;
     }

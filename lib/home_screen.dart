@@ -387,7 +387,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             loteria: purchase.lottery.name,
                             sorteo: purchase.draw.name,
                             numero: purchase.number.value,
-                            monto: purchaseAmount);
+                            monto: purchaseAmount,
+                            premio: 0.0);
                         OverlayToast.showToast(
                             context, 'Actualizando tickets...');
 
@@ -473,21 +474,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 for (int i = 0; i < count; i++) {
                   final compras = purchases[i];
                   ticket = Ticket(
-                      codigofranquicia:
-                          AgenciaActual.agenciaActual[0].codigofranquicia,
-                      codigoagencia:
-                          AgenciaActual.agenciaActual[0].codigoagencia,
-                      nombreagencia:
-                          AgenciaActual.agenciaActual[0].nombreagencia,
-                      correousuario: AgenciaActual.agenciaActual[0].correo,
-                      nroticket: SerialFactura.sfLista[0].sfticket.toString(),
-                      serial: SerialFactura.sfLista[0].sfserial.toString(),
-                      fecha: xfecha,
-                      hora: formattedTime,
-                      loteria: compras.lottery.name,
-                      sorteo: compras.draw.name,
-                      numero: compras.number.value,
-                      monto: purchaseAmount);
+                    codigofranquicia:
+                        AgenciaActual.agenciaActual[0].codigofranquicia,
+                    codigoagencia: AgenciaActual.agenciaActual[0].codigoagencia,
+                    nombreagencia: AgenciaActual.agenciaActual[0].nombreagencia,
+                    correousuario: AgenciaActual.agenciaActual[0].correo,
+                    nroticket: SerialFactura.sfLista[0].sfticket.toString(),
+                    serial: SerialFactura.sfLista[0].sfserial.toString(),
+                    fecha: xfecha,
+                    hora: formattedTime,
+                    loteria: compras.lottery.name,
+                    sorteo: compras.draw.name,
+                    numero: compras.number.value,
+                    monto: purchaseAmount,
+                    premio: 0.0,
+                  );
                   OverlayToast.showToast(context, 'Actualizando tickets...');
                   await ActualizarTicketHelper.actualizar(ticket);
                   OverlayToast.hideToast();
@@ -651,6 +652,7 @@ class PurchaseList extends StatelessWidget {
                   sorteo: purchase.draw.name,
                   numero: purchase.number.value,
                   monto: purchase.amount,
+                  premio: 0.0,
                 );
                 EliminarHelper.actualizar(ticket);
                 onDelete(index);

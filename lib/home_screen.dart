@@ -125,11 +125,19 @@ class _HomeScreenState extends State<HomeScreen> {
   String xfecha = '';
   String hora = '';
   String agencia = '';
-  bool serialkeys = true;
+
   @override
   void initState() {
     super.initState();
     availableLotteries = getAvailableLotteries();
+    // obtenerSerial(AgenciaActual.agenciaActual[0].codigoagencia);
+  }
+
+  @override
+  void dispose() {
+    // updateSerial(AgenciaActual.agenciaActual[0].codigoagencia);
+    // verificar serial y nroticket
+    super.dispose();
   }
 
   @override
@@ -340,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.yellow, // Background color
                 ),
-                onPressed: () {
+                onPressed: () async {
                   for (Lottery lottery in selectedLotteries) {
                     for (Draw draw in selectedDraws) {
                       for (Number number in selectedNumbers) {
@@ -350,8 +358,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           number: number,
                           amount: purchaseAmount,
                         );
-                        obtenerSerial(
-                            AgenciaActual.agenciaActual[0].codigoagencia);
+                        //               obtenerSerial(
+                        //                    AgenciaActual.agenciaActual[0].codigoagencia);
                         serial = SerialFactura.sfLista[0].sfserial;
                         nroTicket = SerialFactura.sfLista[0].sfticket;
                         final xxfecha = DateTime.now();
@@ -380,7 +388,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             sorteo: purchase.draw.name,
                             numero: purchase.number.value,
                             monto: purchaseAmount);
-                        ActualizarHelper.actualizar(ticket);
+                        OverlayToast.showToast(
+                            context, 'Actualizando tickets...');
+
+                        await ActualizarHelper.actualizar(ticket);
+                        OverlayToast.hideToast();
+
                         setState(() {
                           purchases.add(purchase);
                         });
@@ -445,8 +458,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     120, 25), // Ajusta el ancho y alto según tus necesidades
                 backgroundColor: Colors.yellow,
               ),
-              onPressed: () {
-                obtenerSerial(AgenciaActual.agenciaActual[0].codigoagencia);
+              onPressed: () async {
+//                obtenerSerial(AgenciaActual.agenciaActual[0].codigoagencia);
                 serial = SerialFactura.sfLista[0].sfserial;
                 nroTicket = SerialFactura.sfLista[0].sfticket;
                 final xxfecha = DateTime.now();
@@ -475,13 +488,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       sorteo: compras.draw.name,
                       numero: compras.number.value,
                       monto: purchaseAmount);
-                  ActualizarTicketHelper.actualizar(ticket);
+                  OverlayToast.showToast(context, 'Actualizando tickets...');
+                  await ActualizarTicketHelper.actualizar(ticket);
+                  OverlayToast.hideToast();
                 }
 //                imprimirLista(
 //                    purchases, nroTicket, serial, agencia, xfecha, hora);
+                //       obtenerSerial(AgenciaActual.agenciaActual[0].codigoagencia);
+                SerialFactura.sfLista[0].sfticket = 0;
+                SerialFactura.sfLista[0].sfserial = 0;
                 setState(() {
+                  SerialFactura.sfLista[0].sfticket = 0;
+                  SerialFactura.sfLista[0].sfserial = 0;
                   purchases.clear();
-                  serialkeys = true;
                 });
                 // Lógica para enviar a impresión
               },
@@ -505,7 +524,49 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-void obtenerSerial(codagencia) async {
+void updateSerial(codagencia) async {
+  final response = await cliente
+      .from('agencias')
+      .select(
+          'codigofranquicia,codigoagencia,nombreagencia,direccion,correo,banco,telefono,cedulaadmin,cupo,comision,nroticket')
+      .eq('codigoagencia', codagencia);
+  var data1 = response.map((item) {
+    return Agencia(
+      codigofranquicia: item['codigofranquicia'] as String,
+      codigoagencia: item['codigoagencia'] as String,
+      nombreagencia: item['nombreagencia'] as String,
+      direccion: item['direccion'] as String,
+      correo: item['correo'] as String,
+      banco: item['banco'] as String,
+      telefono: item['telefono'] as String,
+      cedulaadmin: item['cedulaadmin'] as String,
+      cupo: item['cupo'] as double,
+      comision: item['comision'] as double,
+      nroticket: item['nroticket'] as int,
+    );
+  }).toList();
+  int numeroTicket = data1[0].nroticket - 1;
+  await cliente.from('agencias').update({
+    'nroticket': numeroTicket,
+  }).eq('codigoagencia', codagencia);
+  SerialFactura.sfLista[0].sfticket = numeroTicket;
+
+  final response1 = await cliente.from('banquero').select(
+      'email,nombre,maximoanimal,maxterminal,maxtriple,maxtripleta,serial');
+  int count = response1.length;
+
+  List<Banquero> data = [];
+  for (int i = 0; i < count; i++) {
+    data.add(Banquero.fromMap(response1[i]));
+  }
+  int nroSerial = data[0].serial - 1;
+  await cliente
+      .from('banquero')
+      .update({'serial': nroSerial}).eq('email', data[0].email);
+  SerialFactura.sfLista[0].sfserial = nroSerial;
+}
+
+Future<void> obtenerSerial(codagencia) async {
   final response = await cliente
       .from('agencias')
       .select(
@@ -630,5 +691,39 @@ void imprimirLista(purchases, nroticket, serial, agencia, fecha, hora) async {
     print('Impresión exitosa');
   } else {
     print('Error en la solicitud HTTP: ${response.statusCode}');
+  }
+}
+
+class OverlayToast {
+  static OverlayEntry? _overlayEntry;
+
+  static void showToast(BuildContext context, String message) {
+    _overlayEntry = OverlayEntry(
+      builder: (BuildContext context) {
+        return Positioned(
+          top: MediaQuery.of(context).size.height * 0.4,
+          left: MediaQuery.of(context).size.width * 0.25,
+          right: MediaQuery.of(context).size.width * 0.25,
+          child: Opacity(
+            opacity: 0.8,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 25)),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  static void hideToast() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
   }
 }

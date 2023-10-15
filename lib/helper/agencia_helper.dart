@@ -7,7 +7,7 @@ class AgenciaHelper {
     final response = await cliente
         .from('agencias')
         .select(
-            'codigoagencia,nombreagencia,direccion,banco,telefono,cedulaadmin,cupo,comision,nroticket,serial')
+            'codigofranquicia,codigoagencia,nombreagencia,direccion,banco,telefono,cedulaadmin,cupo,comision,nroticket,serial')
         .eq('codigoagencia', codagencia);
     return AgenciaActual.agenciaActual = response.map((item) {
       return Agencia(
@@ -30,6 +30,7 @@ class AgenciaHelper {
     await cliente.from('agencia').insert([
       {
         'codigoagencia': agencia.codigoagencia,
+        'codigofranquicia': agencia.codigofranquicia,
         'nombreagencia': agencia.nombreagencia,
         'direccion': agencia.direccion,
         'correo': agencia.correo,

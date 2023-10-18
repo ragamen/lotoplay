@@ -1,15 +1,9 @@
-//import 'package:flutter/foundation.dart';
-
 import 'package:flutter/material.dart';
-//import 'package:lotoplay/helper/agencia_helper.dart';
 import 'package:lotoplay/helper/common.dart';
-//import 'package:lotoplay/home_menu.dart';
 import 'package:lotoplay/home_screen.dart';
-//import 'package:lotoplay/home_screen.dart';
 import 'package:lotoplay/models/agencialista.dart';
 import 'package:lotoplay/models_sp/agencia.dart';
 import 'package:lotoplay/stars_page.dart';
-//import 'package:lotoplay/models_sp/agencia.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {

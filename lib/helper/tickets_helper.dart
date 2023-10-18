@@ -16,7 +16,7 @@ class TicketsHelper {
       return Ticket(
         codigofranquicia: item['codigofranquicia'] as String,
         codigoagencia: item['codigoagencia'] as String,
-        nombreagencia: item['codigoagencia'] as String,
+        nombreagencia: item['nombreagencia'] as String,
         correousuario: item['taquilla'] as String,
         nroticket: item['nroticket'] as String,
         serial: item['serial'] as String,

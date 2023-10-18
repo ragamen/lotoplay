@@ -201,7 +201,7 @@ class ActualizarHelper {
       ]);
     } else {
       var njugada =
-          double.parse(data1[0].maximo) - double.parse(data1[0].jugada);
+          double.parse(data2[0].maximo) - double.parse(data2[0].jugada);
       if (njugada >= ticket.monto) {
         ticket.monto = ticket.monto;
       }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lotoplay/helper/actualizar_helper.dart';
 import 'package:lotoplay/helper/actualizar_ticket.dart';
@@ -389,6 +390,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             numero: purchase.number.value,
                             monto: purchaseAmount,
                             premio: 0.0);
+                        if (kDebugMode) {
+                          print("monto de la jugada$purchaseAmount");
+                        }
                         OverlayToast.showToast(
                             context, 'Actualizando tickets...');
 
@@ -486,9 +490,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     loteria: compras.lottery.name,
                     sorteo: compras.draw.name,
                     numero: compras.number.value,
-                    monto: purchaseAmount,
+                    monto: compras.amount,
                     premio: 0.0,
                   );
+                  if (kDebugMode) {
+                    print(
+                        "monto de la jugada 2+++ ${AgenciaActual.agenciaActual[0].codigofranquicia}");
+                  }
+
                   OverlayToast.showToast(context, 'Actualizando tickets...');
                   await ActualizarTicketHelper.actualizar(ticket);
                   OverlayToast.hideToast();

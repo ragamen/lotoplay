@@ -36,6 +36,7 @@ class TicketsHelperPsql {
         sorteo: row[9],
         numero: row[10],
         monto: row[11],
+        premio: row[12],
       );
     }).toList();
     return tickets;

@@ -8,6 +8,7 @@ class ActualizarTicketHelper {
 //
 //  Registra el ticket
 //
+
     if (int.parse(ticket.nroticket) == 0) {
       await obtenerSerial(AgenciaActual.agenciaActual[0].codigoagencia);
       ticket.nroticket = SerialFactura.sfLista[0].sfticket.toString();
@@ -16,8 +17,9 @@ class ActualizarTicketHelper {
     if (int.parse(ticket.nroticket) != 0) {
       await cliente.from('tickets').insert([
         {
-          'codigoagencia': ticket.codigoagencia,
           'codigofranquicia': ticket.codigofranquicia,
+          'codigoagencia': ticket.codigoagencia,
+          'agencia': ticket.nombreagencia,
           'correousuario': ticket.correousuario,
           'nroticket': ticket.nroticket,
           'serial': ticket.serial,
@@ -27,6 +29,7 @@ class ActualizarTicketHelper {
           'sorteo': ticket.sorteo,
           'numero': ticket.numero,
           'monto': ticket.monto,
+          'premio': ticket.premio,
         }
       ]);
     }
